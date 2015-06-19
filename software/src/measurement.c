@@ -24,7 +24,7 @@
 
 enum statevalues {STATE_FREQUENCY, STATE_INIT, STATE_WAIT_FOR_COMPONENT, STATE_MEASURE1, STATE_MEASURE2, STATE_ADJUST_RANGE_AND_FREQUENCY, STATE_CHECK_COIL, STATE_CHECK_RESISTOR, STATE_NEXT, STATE_CORRECT_DC};
 
-const float ReferenceResistor[] = { 100.7, 2005.0, 20020.0, 199400.0, 1977000.0, 0.0, 0.0, 198.7};
+const float ReferenceResistor[] = { 100.0, 2000.0, 20000.0, 200000.0, 2000000.0, 0.0, 0.0, 200.0};
 float ReferenceCorrection[CORRECTION_VALUES];
 float MeasureCorrection[CORRECTION_VALUES];
 
@@ -440,7 +440,7 @@ void Calibrate()
 
 void FindRange()
 {
-   float v1;
+   float v1, v2 = 0.0;
 
    while (true)
    {
@@ -449,26 +449,67 @@ void FindRange()
 
       if ((v1 < 0.1) && (Measurement.MeasurementRange > 0))
       {
+         // decrease measurement range (smaller component value) without changing frequency / type of component
          Measurement.MeasurementRange--;
          SetRange(Measurement.MeasurementRange);
       }
       else if ((v1 > 1.3) && (Measurement.MeasurementRange < 4))
       {
+         // increase measurement range without changing frequency / type of component
          Measurement.MeasurementRange++;
          SetRange(Measurement.MeasurementRange);
       }
-      else if ((v1 < 0.1) && (Measurement.MeasurementRange == 0) && (Measurement.Index == FREQ_1KHZ))
+      else if ((v1 < 0.1) && (Measurement.MeasurementRange == 0) && (Measurement.Index == FREQ_500HZ))
       {
+         // smallest range and still no measurement value within range; increase frequency
          Measurement.Index = FREQ_50HZ;
          SetOutput(Measurement.Index, DAC_AMPLITUDE, 3);
       }
-      else if ((v1 < 0.051) && (Measurement.Index == FREQ_50HZ))
+      else if ((v1 < 0.1) && (Measurement.Index == FREQ_50HZ))
       {
          Measurement.Index = FREQ_50KHZ;
          SetOutput(Measurement.Index, DAC_AMPLITUDE, 3);
       }
+      else if ((v1 >= 0.1) && (v1 <= 1.3) && (Measurement.Index == FREQ_500HZ))
+      {
+         v2 = v1;
+         Measurement.Index = FREQ_1KHZ;
+         SetOutput(Measurement.Index, DAC_AMPLITUDE, 3);
+      }
       else
       {
+         // finished measuring; determine component type
+         if (Measurement.Index == FREQ_500HZ)
+         {
+            Measurement.Component = TypeResistor;
+         }
+         else if (Measurement.Index == FREQ_50HZ)
+         {
+            Measurement.Component = TypeCapacitor;            
+         }
+         else if (Measurement.Index == FREQ_50KHZ)
+         {
+            Measurement.Component = TypeInductor;
+         }         
+         else if (Measurement.Index == FREQ_1KHZ)
+         {
+            if (v2 > v1 + 0.05)
+            {
+               Measurement.Component = TypeCapacitor;
+            }
+            else if (v2 <= v1 - 0.05)
+            {               
+                Measurement.Component = TypeInductor;
+            }
+            else
+            {
+               Measurement.Component = TypeResistor;
+            }
+         }
+         else   
+         {
+            Measurement.Component = TypeResistor;
+         }
          return;
       }
    }   
@@ -478,7 +519,7 @@ void Measure()
 {
    static uint8_t state = STATE_INIT;
    static float v1 = 0.0, v2 = 0.0;
-   enum FrequencyIndex oldIndex;
+//   enum FrequencyIndex oldIndex;
     
    while (true)
    {
@@ -486,7 +527,7 @@ void Measure()
       {
          // set everything up
          case STATE_INIT:
-            resetMeasurement(&Measurement, FREQ_1KHZ);
+            resetMeasurement(&Measurement, FREQ_500HZ);
             SetRange(Measurement.MeasurementRange);
             SetOutput(Measurement.Index, DAC_AMPLITUDE, 3);
             UartWrite("STATE_INIT\n\r");
@@ -496,7 +537,7 @@ void Measure()
          // reset measurement frequency and range and wait for a unknown component to be connected to the test leads   
          case STATE_WAIT_FOR_COMPONENT:
             UartWrite("STATE_TEST\n\r");
-            resetMeasurement(&Measurement, FREQ_1KHZ);
+            resetMeasurement(&Measurement, FREQ_500HZ);
             SetRange(Measurement.MeasurementRange);
             SetOutput(Measurement.Index, DAC_AMPLITUDE, 3);
             DoMeasurement(&Measurement);
@@ -521,40 +562,40 @@ void Measure()
             SetRange(Measurement.MeasurementRange);
             SetOutput(Measurement.Index, DAC_AMPLITUDE, 3);
             FindRange();
-            v1 = Measurement.Measured / Measurement.Reference;
-
-            if (Measurement.Index < FREQ_1KHZ)
-            {
-               Measurement.Component = TypeCapacitor;
-            }
-            else if (Measurement.Index > FREQ_1KHZ)
-            {
-                Measurement.Component = TypeInductor;
-            }
-            else
-            {
-               UartWrite("STATE_ADJUST_RANGE_AND_FREQUENCY\n\r");
-               oldIndex = Measurement.Index;
-               Measurement.Index = FREQ_200HZ;
-               SetOutput(Measurement.Index, DAC_AMPLITUDE, 3);
-               DoMeasurement(&Measurement);
-               v2 = Measurement.Measured / Measurement.Reference;
-               if (v2 < v1 - 0.01)
-               {
-                  Measurement.Component = TypeInductor;
-               }
-               else if (v2 > v1 + 0.01)
-               {
-                  Measurement.Component = TypeCapacitor;
-               }
-               else
-               {
-                   Measurement.Component = TypeResistor;
-                   oldIndex = FREQ_200HZ;
-               }
-               Measurement.Index = oldIndex;
-               SetOutput(Measurement.Index, DAC_AMPLITUDE, 3);
-            }
+//            v1 = Measurement.Measured / Measurement.Reference;
+//
+//            if (Measurement.Index < FREQ_500HZ)
+//            {
+//               Measurement.Component = TypeCapacitor;
+//            }
+//            else if (Measurement.Index > FREQ_500HZ)
+//            {
+//                Measurement.Component = TypeInductor;
+//            }
+//            else
+//            {
+//               UartWrite("STATE_ADJUST_RANGE_AND_FREQUENCY\n\r");
+//               oldIndex = Measurement.Index;
+//               Measurement.Index = FREQ_200HZ;
+//               SetOutput(Measurement.Index, DAC_AMPLITUDE, 3);
+//               DoMeasurement(&Measurement);
+//               v2 = Measurement.Measured / Measurement.Reference;
+//               if (v2 < v1 - 0.01)
+//               {
+//                  Measurement.Component = TypeInductor;
+//               }
+//               else if (v2 > v1 + 0.01)
+//               {
+//                  Measurement.Component = TypeCapacitor;
+//               }
+//               else
+//               {
+//                   Measurement.Component = TypeResistor;
+//                   oldIndex = FREQ_200HZ;
+//               }
+//               Measurement.Index = oldIndex;
+//               SetOutput(Measurement.Index, DAC_AMPLITUDE, 3);
+//            }
             ExportInt32("index = ", Measurement.Index);
             ExportInt32("range = ", Measurement.MeasurementRange);
             state = STATE_MEASURE1;

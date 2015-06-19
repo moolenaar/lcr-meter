@@ -2,11 +2,6 @@
 Microsoft Visual Studio Solution File, Format Version 11.00
 # Atmel Studio Solution File, Format Version 11.00
 Project("{54F91283-7BC4-4236-8FF9-10F437C3AD48}") = "lcr meter", "lcr meter.cproj", "{3AEF6064-668E-4CBB-8091-A7B63188EBD4}"
-	ProjectSection(ProjectDependencies) = postProject
-		{0AB93D99-549D-4E6D-848F-526066B168BC} = {0AB93D99-549D-4E6D-848F-526066B168BC}
-	EndProjectSection
-EndProject
-Project("{54F91283-7BC4-4236-8FF9-10F437C3AD48}") = "complex", "complex\complex.cproj", "{0AB93D99-549D-4E6D-848F-526066B168BC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -18,10 +13,6 @@ Global
 		{3AEF6064-668E-4CBB-8091-A7B63188EBD4}.Debug|AVR.Build.0 = Debug|AVR
 		{3AEF6064-668E-4CBB-8091-A7B63188EBD4}.Release|AVR.ActiveCfg = Release|AVR
 		{3AEF6064-668E-4CBB-8091-A7B63188EBD4}.Release|AVR.Build.0 = Release|AVR
-		{0AB93D99-549D-4E6D-848F-526066B168BC}.Debug|AVR.ActiveCfg = Debug|AVR
-		{0AB93D99-549D-4E6D-848F-526066B168BC}.Debug|AVR.Build.0 = Debug|AVR
-		{0AB93D99-549D-4E6D-848F-526066B168BC}.Release|AVR.ActiveCfg = Release|AVR
-		{0AB93D99-549D-4E6D-848F-526066B168BC}.Release|AVR.Build.0 = Release|AVR
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

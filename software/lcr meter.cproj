@@ -168,7 +168,7 @@
         </avrgcc.compiler.symbols.DefSymbols>
         <avrgcc.compiler.directories.IncludePaths>
           <ListValues>
-            <Value>../header</Value>
+            <Value>../inc</Value>
           </ListValues>
         </avrgcc.compiler.directories.IncludePaths>
         <avrgcc.compiler.optimization.level>Optimize more (-O2)</avrgcc.compiler.optimization.level>
@@ -205,34 +205,34 @@
     <OutputType>Executable</OutputType>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="header\display.h">
+    <Compile Include="inc\display.h">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="header\export.h">
+    <Compile Include="inc\export.h">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="header\general.h">
+    <Compile Include="inc\general.h">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="header\font.h">
+    <Compile Include="inc\font.h">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="header\generator.h">
+    <Compile Include="inc\generator.h">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="header\kernel.h">
+    <Compile Include="inc\kernel.h">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="header\lcd.h">
+    <Compile Include="inc\lcd.h">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="header\measurement.h">
+    <Compile Include="inc\measurement.h">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="header\nvm.h">
+    <Compile Include="inc\nvm.h">
       <SubType>compile</SubType>
     </Compile>
-    <Compile Include="header\uart.h">
+    <Compile Include="inc\uart.h">
       <SubType>compile</SubType>
     </Compile>
     <Compile Include="src\display.c">
@@ -267,7 +267,7 @@
     </Compile>
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="header" />
+    <Folder Include="inc" />
     <Folder Include="src\" />
   </ItemGroup>
   <Import Project="$(AVRSTUDIO_EXE_PATH)\\Vs\\Compiler.targets" />
